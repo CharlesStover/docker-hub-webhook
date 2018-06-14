@@ -4,6 +4,7 @@
   "description": "A Docker container designed to listen for and redeploy images from Docker Hub webhooks.",
   "main": "index.js",
   "scripts": {
+    "docker-build": "docker build --file Dockerfile --tag charlesstover/docker-hub-webhook .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
