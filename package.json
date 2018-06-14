@@ -1,0 +1,30 @@
+{
+  "name": "docker-hub-webhook",
+  "version": "1.0.0",
+  "description": "A Docker container designed to listen for and redeploy images from Docker Hub webhooks.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CharlesStover/docker-hub-webhook.git"
+  },
+  "keywords": [
+    "docker",
+    "docker",
+    "hub",
+    "webhook",
+    "webhooks"
+  ],
+  "author": "Charles Stover",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CharlesStover/docker-hub-webhook/issues"
+  },
+  "homepage": "https://github.com/CharlesStover/docker-hub-webhook#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3"
+  }
+}
