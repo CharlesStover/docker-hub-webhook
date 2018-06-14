@@ -81,6 +81,9 @@ app.post('/webhooks/:token', (request) => {
       });
     });
   }
+  else {
+    console.warn('[Error]', request.params.token, request.body);
+  }
 });
 
 app.listen(80);
