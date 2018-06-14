@@ -66,9 +66,9 @@ app.post('/webhooks/:token', (request) => {
           exec(
             'docker run ' +
             '--detach ' +
-            '--label traefik.docker.network=traefik ' +
+            '--label traefik.docker.network=' + process.env.network + ' ' +
             '--name ' + request.body.repository.name + ' ' +
-            '--network traefik ' +
+            '--network ' + process.env.network + ' ' +
             '--restart always ' +
             request.body.repository.repo_name,
             (err4) => {
