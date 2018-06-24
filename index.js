@@ -6,7 +6,7 @@ const months = [ 'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May ', 'Jun.', 'Jul.', 'Aug.',
 
 app.use(bodyParser.json());
 
-app.post('/webhooks/:token', (request) => {
+app.post('/webhooks/:token', (request, response) => {
   if (
     typeof request.body === 'object' &&
     request.body !== null &&
@@ -54,14 +54,17 @@ app.post('/webhooks/:token', (request) => {
     exec('docker stop ' + request.body.repository.name, (err) => {
       if (err) {
         console.error('[Error] docker stop:', err);
+        response.end();
       }
       exec('docker rm ' + request.body.repository.name, (err2) => {
         if (err2) {
           console.error('[Error] docker rm:', err2);
+          response.end();
         }
         exec('docker rmi ' + request.body.repository.repo_name, (err3) => {
           if (err3) {
             console.error('[Error] docker rmi:', err3);
+            response.end();
           }
           exec(
             'docker run ' +
@@ -75,6 +78,7 @@ app.post('/webhooks/:token', (request) => {
               if (err4) {
                 console.error('[Error] docker run:', err4);
               }
+              response.end();
             }
           );
         });
@@ -83,6 +87,7 @@ app.post('/webhooks/:token', (request) => {
   }
   else {
     console.warn('[Error]', request.params.token, request.body);
+    response.end();
   }
 });
 
