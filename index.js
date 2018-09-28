@@ -24,7 +24,7 @@ app.post('/webhooks/:token', (request, response) => {
     typeof request.body.repository.repo_name === 'string' &&
     /^[\d\w]+\/[\d\w]+$/.test(request.body.repository.repo_name) &&
     Object.prototype.hasOwnProperty.call(process.env, 'token-' + request.body.repository.name) &&
-    request.params.token === process.env[token + '-' + request.body.repository.name]
+    request.params.token === process.env['token-' + request.body.repository.name]
   ) {
     const meta = [ ];
     if (request.body.repository.is_official) {
@@ -51,36 +51,47 @@ app.post('/webhooks/:token', (request, response) => {
           ''
       )
     );
-    exec('docker stop ' + request.body.repository.name, (err) => {
-      if (err) {
-        console.error('[Error] docker stop:', err);
+    exec('docker pull ' + request.body.repo_name, errPull => {
+      if (errPull) {
+        console.error('[Error] docker pull:', errPull);
         response.end();
+        return;
       }
-      exec('docker rm ' + request.body.repository.name, (err2) => {
-        if (err2) {
-          console.error('[Error] docker rm:', err2);
+      exec('docker stop ' + request.body.repository.name, errStop => {
+        if (errStop) {
+          console.error('[Error] docker stop:', errStop);
           response.end();
+          return;
         }
-        exec('docker rmi ' + request.body.repository.repo_name, (err3) => {
-          if (err3) {
-            console.error('[Error] docker rmi:', err3);
+        exec('docker rm ' + request.body.repository.name, errRm => {
+          if (errRm) {
+            console.error('[Error] docker rm:', errRm);
             response.end();
+            return;
           }
-          exec(
-            'docker run ' +
-            '--detach ' +
-            '--label traefik.docker.network=' + process.env.network + ' ' +
-            '--name ' + request.body.repository.name + ' ' +
-            '--network ' + process.env.network + ' ' +
-            '--restart always ' +
-            request.body.repository.repo_name,
-            (err4) => {
-              if (err4) {
-                console.error('[Error] docker run:', err4);
-              }
+          exec('docker rmi ' + request.body.repository.repo_name, errRmi => {
+            if (errRmi) {
+              console.error('[Error] docker rmi:', errRmi);
               response.end();
+              return;
             }
-          );
+            exec(
+              'docker run ' +
+              '--detach ' +
+              '--name ' + request.body.repository.name + ' ' +
+              '--network ' + process.env.network + ' ' +
+              '--restart always ' +
+              '--volume /var/log/docker/' + request.body.repository.name + ':/var/log/apache2 ' +
+              '--volume /var/log/docker/' + request.body.repository.name + ':/var/log/nginx ' +
+              request.body.repository.repo_name,
+              errRun => {
+                if (errRun) {
+                  console.error('[Error] docker run:', errRun);
+                }
+                response.end();
+              }
+            );
+          });
         });
       });
     });
